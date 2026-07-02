@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>SELOG Chess</title>
+<style>
+body { font-family: Arial; background: #e6f0ff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+h1 { color: #1a4d8f; margin-bottom: 10px; }
+.board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 4px solid #1a4d8f; }
+.square { width: 60px; height: 60px; font-size: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.white { background: #f0d9b5; }
+.black { background: #b58863; }
+.selected { outline: 3px solid yellow; }
+.turn { margin: 15px; font-size: 18px; font-weight: bold; color: #0f2f5c; }
+button { background: #1a4d8f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 15px; }
+button:hover { background: #0f2f5c; }
+</style>
+</head>
+<body>
+<h1>♟️ SELOG Chess</h1>
+<div id="turn" class="turn">Giliran: Putih</div>
+<div id="board" class="board"></div>
+<button onclick="resetGame()">Reset Papan</button>
+
+<script>
+const pieces = {r:'♜',n:'♞',b:'♝',q:'♛',k:'♚',p:'♟',R:'♖',N:'♘',B:'♗',Q:'♕',K:'♔',P:'♙'};
+let board = [
+  ['r','n','b','q','k','b','n','r'],
+  ['p','p','p','p','p','p','p','p'],
+  ['.','.','.'],
+  ['.','.','.'],
+  ['.','.'],
+  ['.','.','.','.','.','.','.','.'],
+  ['P','P','P','P','P','P','P','P'],
+  ['R','N','B','Q','K','B','N','R']
+];
+let selected = null;
+let turn = 'white';
+
+function drawBoard() {
+  const boardDiv = document.getElementById("board");
+  boardDiv.innerHTML = "";
+  for(let i=0; i<8; i++) {
+    for(let j=0; j<8; j++) {
+      let sq = document.createElement("div");
+      sq.className = "square " + ((i+j)%2===0? "white" : "black");
+      sq.dataset.row = i;
+      sq.dataset.col = j;
+      sq.innerText = pieces[board[i][j]] || "";
+      if(selected && selected.row==i && selected.col==j) sq.classList.add("selected");
+      sq.onclick = () => move(i,j);
+      boardDiv.appendChild(sq);
+    }
+  }
+}
+
+function move(r,c) {
+  let piece = board[r][c];
+  if(selected) {
+    board[r][c] = board[selected.row][selected.col];
+    board[selected.row][selected.col] = '.';
+    selected = null;
+    turn = turn==='white'? 'black' : 'white';
+    document.getElementById("turn").innerText = "Giliran: " + (turn==='white'?'Putih':'Hitam');
+  } else {
+    if(piece!=='.' && (turn==='white'? piece===piece.toUpperCase() : piece===piece.toLowerCase())) {
+      selected = {row:r, col:c};
+    }
+  }
+  drawBoard();
+}
+
+function resetGame() {
+  board = [
+    ['r','n','b','q','k','b','n','r'],
+    ['p','p','p','p','p','p','p','p'],
+    ['.','.'],
+    ['.','.','.','.','.','.'],
+    ['.','.'],
+    ['.','.'],
+    ['P','P','P','P','P','P','P','P'],
+    ['R','N','B','Q','K','B','N','R']
+  ];
+  turn = 'white';
+  selected = null;
+  document.getElementById("turn").innerText = "Giliran: Putih";
+  drawBoard();
+}
+
+drawBoard();
+</script>
+</body>
+</html>
